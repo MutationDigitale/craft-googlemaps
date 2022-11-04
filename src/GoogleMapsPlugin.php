@@ -19,12 +19,15 @@ use craft\elements\Entry;
 use craft\events\PluginEvent;
 use craft\events\RegisterComponentTypesEvent;
 use craft\events\RegisterElementExportersEvent;
+use craft\events\RegisterGqlTypesEvent;
 use craft\helpers\UrlHelper;
 use craft\services\Fields;
+use craft\services\Gql;
 use craft\services\Plugins;
 use doublesecretagency\googlemaps\exporters\AddressesCondensedExporter;
 use doublesecretagency\googlemaps\exporters\AddressesExpandedExporter;
 use doublesecretagency\googlemaps\fields\AddressField;
+use doublesecretagency\googlemaps\gql\types\AddressGqlType;
 use doublesecretagency\googlemaps\models\Settings;
 use doublesecretagency\googlemaps\web\assets\SettingsAsset;
 use doublesecretagency\googlemaps\web\twig\Extension;
@@ -140,6 +143,15 @@ class GoogleMapsPlugin extends Plugin
                 // Redirect to the plugin's settings page (with a welcome message)
                 $url = UrlHelper::cpUrl('settings/plugins/google-maps', ['welcome' => 1]);
                 Craft::$app->getResponse()->redirect($url)->send();
+            }
+        );
+        
+        // Register GraphQL type
+        Event::on(
+            Gql::class,
+            Gql::EVENT_REGISTER_GQL_TYPES,
+            function (RegisterGqlTypesEvent $event) {
+                $event->types[] = AddressGqlType::class;
             }
         );
     }
